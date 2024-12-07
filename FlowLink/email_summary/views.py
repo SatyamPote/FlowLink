@@ -5,7 +5,6 @@ from social_django.utils import psa
 from django.conf import settings
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
 import io
 import base64
 import requests
