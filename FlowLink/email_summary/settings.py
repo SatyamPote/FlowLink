@@ -2,7 +2,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-%((@z^%st@+hlfspq(3ramtspfmi*-jwjk_@gwz=478u$+%2x$'
+SECRET_KEY = 'django-insecure-CHANGE-THIS-KEY'
 
 DEBUG = True
 
@@ -78,8 +78,8 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_GITHUB_KEY = 'Ov23liBQst9UX87RSBil'  # Your GitHub Client ID
-SOCIAL_AUTH_GITHUB_SECRET = 'YOUR_GITHUB_CLIENT_SECRET'  # Your GitHub Client Secret
+SOCIAL_AUTH_GITHUB_KEY = 'Ov23liBQst9UX87RSBil'
+SOCIAL_AUTH_GITHUB_SECRET = 'YOUR_GITHUB_CLIENT_SECRET'
 
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
@@ -91,4 +91,5 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / "email_summary" / "static"]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
