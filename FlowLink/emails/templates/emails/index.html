@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email List</title>
+</head>
+<body>
+    <h1>Email List</h1>
+    <ul>
+        {% for email in emails %}
+            <li><a href="{% url 'email_detail' email.id %}">{{ email.subject }}</a> from {{ email.sender_name }}</li>
+            <p>{{ email.get_summary }}...</p>
+        {% endfor %}
+    </ul>
+</body>
+</html>
