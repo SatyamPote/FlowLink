@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from emails import views as email_views
 from email_summary import views as main_views
 
@@ -12,4 +12,6 @@ urlpatterns = [
     path('emails/', email_views.email_list, name='email_list'),
     path('emails/<int:email_id>/', email_views.email_detail, name='email_detail'),
     path('authorize/', main_views.authorize, name='authorize'),
+    path('oauth/', include('social_django.urls', namespace='social')),
+    path('github/', main_views.github_dashboard, name='github_dashboard'),  # New GitHub dashboard
 ]

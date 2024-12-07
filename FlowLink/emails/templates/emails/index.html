@@ -1,15 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Email List</title>
-</head>
-<body>
-    <h1>Email List</h1>
-    <ul>
-        {% for email in emails %}
-            <li><a href="{% url 'email_detail' email.id %}">{{ email.subject }}</a> from {{ email.sender_name }}</li>
-            <p>{{ email.get_summary }}...</p>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Login - FlowLink{% endblock %}
+
+{% block content %}
+    <h2>Login</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+    <p>Or login with:</p>
+    <a href="{% url 'social:begin' 'github' %}">Login with GitHub</a>
+{% endblock %}

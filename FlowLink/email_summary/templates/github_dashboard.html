@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}GitHub Dashboard - FlowLink{% endblock %}
+
+{% block content %}
+    <h2>GitHub Dashboard</h2>
+    <h3>Pull Requests</h3>
+    <ul>
+        {% for pr in pull_requests %}
+            <li>
+                <a href="{{ pr.html_url }}">{{ pr.title }}</a>
+                by {{ pr.user.login }} - {{ pr.state }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
