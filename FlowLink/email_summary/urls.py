@@ -13,5 +13,7 @@ urlpatterns = [
     path('emails/<int:email_id>/', email_views.email_detail, name='email_detail'),
     path('authorize/', main_views.authorize, name='authorize'),
     path('oauth/', include('social_django.urls', namespace='social')),
-    path('github/', main_views.github_dashboard, name='github_dashboard'),  # New GitHub dashboard
+    path('github/', main_views.github_dashboard, name='github_dashboard'),
+    path('upload_excel/', main_views.upload_excel, name='upload_excel'),
+    path('excel_summary/', main_views.excel_summary, name='excel_summary'),
 ]
