@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Email List - FlowLink{% endblock %}
+
+{% block content %}
+    <h2 class="my-4">Email List</h2>
+    <ul class="list-group">
+        {% for email in emails %}
+            <li class="list-group-item">
+                <strong>{{ email.subject }}</strong><br>
+                From: {{ email.sender_name }} ({{ email.sender_email }})<br>
+                Received on: {{ email.date_received }}<br>
+                <a href="{% url 'email_detail' email.id %}" class="btn btn-secondary btn-sm mt-2">View Details</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

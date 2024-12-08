@@ -12,6 +12,7 @@ body {
     color: #333;
 }
 
+/* Header and Navigation */
 header {
     background-color: #35424a;
     color: #ffffff;
@@ -33,6 +34,7 @@ nav ul li a {
     text-decoration: none;
 }
 
+/* Main Content */
 main {
     padding: 2rem;
     max-width: 800px;
@@ -41,6 +43,7 @@ main {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Footer */
 footer {
     text-align: center;
     padding: 1rem 0;
@@ -51,6 +54,7 @@ footer {
     bottom: 0;
 }
 
+/* Dashboard Options */
 .dashboard-options {
     display: flex;
     justify-content: center;
@@ -84,25 +88,7 @@ footer {
     background: #273440;
 }
 
-@media (max-width: 600px) {
-    nav ul {
-        flex-direction: column;
-    }
-
-    nav ul li {
-        margin: 0.5rem 0;
-    }
-
-    main {
-        padding: 1rem;
-    }
-
-    .dashboard-options {
-        flex-direction: column;
-    }
-}
-
-/* Modal styles */
+/* Modal Styles */
 .modal {
     width: 90%;
     max-width: 500px;
@@ -215,10 +201,6 @@ footer {
     justify-content: flex-end;
 }
 
-.modal-footer [class*="btn-"] {
-    margin-left: 0.75rem;
-}
-
 .btn-secondary,
 .btn-primary {
     padding: 0.5rem 1rem;
@@ -234,4 +216,22 @@ footer {
     background-color: #1cc972;
     border-color: #1cc972;
     cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav ul li {
+        margin: 0.5rem 0;
+    }
+
+    main {
+        padding: 1rem;
+    }
+
+    .dashboard-options {
+        flex-direction: column;
+    }
 }

@@ -3,10 +3,23 @@
 {% block title %}Excel Summary - FlowLink{% endblock %}
 
 {% block content %}
-    <h2 class="my-4">Excel Data Summary</h2>
-    <div class="summary">
-        {{ summary|safe }}
-    </div>
-    <h3>Data Visualization</h3>
-    <img src="data:image/png;base64,{{ plot_url }}">
+    <h2 class="my-4">Email Summary in Excel</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>From</th>
+                <th>Subject</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for email in emails %}
+                <tr>
+                    <td>{{ email.from }}</td>
+                    <td>{{ email.subject }}</td>
+                    <td>{{ email.date }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

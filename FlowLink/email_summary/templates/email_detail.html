@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Email Detail - FlowLink{% endblock %}
+
+{% block content %}
+    <h1>{{ email.subject }}</h1>
+    <p>From: {{ email.sender_name }} ({{ email.sender_email }})</p>
+    <p>Received on: {{ email.date_received }}</p>
+    <p>{{ email.summary }}</p>
+    <a href="{% url 'email_list' %}">Back to Email List</a>
+{% endblock %}

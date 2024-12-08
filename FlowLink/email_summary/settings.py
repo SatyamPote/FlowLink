@@ -93,3 +93,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "email_summary" / "static"]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email settings
+EMAIL_HOST = 'imap.gmail.com'
+EMAIL_PORT = 993
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'satyampote9999@gmail.com'
+EMAIL_HOST_PASSWORD = 'lopn utdt ztue leff'

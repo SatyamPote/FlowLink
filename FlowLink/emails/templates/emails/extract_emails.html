@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Extract Emails - FlowLink{% endblock %}
+
+{% block content %}
+    <h2 class="my-4">Extract Emails</h2>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Extract Emails</button>
+    </form>
+    {% if emails %}
+        <h3 class="my-4">Extracted Emails</h3>
+        <ul class="list-group">
+            {% for email in emails %}
+                <li class="list-group-item">
+                    <strong>From:</strong> {{ email.from }} <br>
+                    <strong>Subject:</strong> {{ email.subject }} <br>
+                    <strong>Date:</strong> {{ email.date }}
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'download_csv' %}" class="btn btn-success mt-4">Download CSV</a>
+    {% endif %}
+{% endblock %}

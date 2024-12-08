@@ -1,14 +1,13 @@
+import imaplib
+import email
+from email.header import decode_header
+import pandas as pd
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from social_django.utils import psa
 from django.conf import settings
-import pandas as pd
-import matplotlib.pyplot as plt
-import io
-import base64
-import requests
-from emails.models import Email
+from django.http import HttpResponse
 
 def login_view(request):
     if request.method == 'POST':
@@ -50,58 +49,62 @@ def authorize(request, backend):
         return redirect('dashboard')
     return redirect('login')
 
-def email_list(request):
-    emails = Email.objects.all()
-    return render(request, 'emails/index.html', {'emails': emails})
+def extract_emails(request):
+    # Connect to the Gmail server
+    mail = imaplib.IMAP4_SSL(settings.EMAIL_HOST)
+    mail.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+    mail.select("inbox")
 
-def email_detail(request, email_id):
-    email = get_object_or_404(Email, pk=email_id)
-    return render(request, 'emails/email_detail.html', {'email': email})
+    # Fetch only the latest 100 emails
+    result, data = mail.search(None, "ALL")
+    email_ids = data[0].split()[-100:]
 
-def github_dashboard(request):
-    user = request.user
-    if not user.is_authenticated:
-        return redirect('login')
+    emails = []
 
-    social = user.social_auth.get(provider='github')
-    token = social.extra_data['access_token']
-    headers = {'Authorization': f'token {token}'}
+    for eid in email_ids:
+        result, msg_data = mail.fetch(eid, "(RFC822)")
+        raw_email = msg_data[0][1]
+        msg = email.message_from_bytes(raw_email)
+        
+        # Decode email subject
+        subject, encoding = decode_header(msg["Subject"])[0]
+        if isinstance(subject, bytes):
+            subject = subject.decode(encoding if encoding else "utf-8")
+        
+        # Get email from and date
+        from_ = msg.get("From")
+        date_ = msg.get("Date")
+        
+        emails.append({"subject": subject, "from": from_, "date": date_})
 
-    prs_url = 'https://api.github.com/user/pulls'
-    prs_response = requests.get(prs_url, headers=headers)
-    prs_data = prs_response.json()
+        # Batch processing: if emails list reaches 20, process them
+        if len(emails) % 20 == 0:
+            save_emails_to_session(request, emails)
+            emails = []
 
-    context = {
-        'pull_requests': prs_data,
-    }
-    return render(request, 'github_dashboard.html', context)
+    # Process any remaining emails
+    if emails:
+        save_emails_to_session(request, emails)
 
-def upload_excel(request):
-    if request.method == 'POST':
-        excel_file = request.FILES['excel_file']
-        data = pd.read_excel(excel_file)
+    return render(request, 'emails/extract_emails.html', {'emails': request.session.get('emails_data')})
 
-        # Save to session or process data immediately
-        request.session['excel_data'] = data.to_dict()
-
-        return redirect('excel_summary')
-
-    return render(request, 'upload_excel.html')
+def save_emails_to_session(request, emails):
+    existing_emails = request.session.get('emails_data', [])
+    existing_emails.extend(emails)
+    request.session['emails_data'] = existing_emails
 
 def excel_summary(request):
-    data = pd.DataFrame(request.session.get('excel_data'))
-    summary = data.describe().to_html()
+    emails = request.session.get('emails_data')
+    return render(request, 'emails/excel_summary.html', {'emails': emails})
 
-    # Create a simple plot
-    plt.figure()
-    data.plot(kind='bar')
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode()
-
-    context = {
-        'summary': summary,
-        'plot_url': plot_url,
-    }
-    return render(request, 'excel_summary.html', context)
+def download_csv(request):
+    emails = request.session.get('emails_data')
+    if not emails:
+        return redirect('extract_emails')
+    
+    df = pd.DataFrame(emails)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="emails_summary.csv"'
+    df.to_csv(path_or_buf=response, index=False)
+    
+    return response
