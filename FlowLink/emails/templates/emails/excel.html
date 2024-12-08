@@ -4,10 +4,18 @@
 
 {% block content %}
     <h2 class="my-4">Extract Emails & Download Data</h2>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Extract Emails</button>
-    </form>
+    <div class="d-flex">
+        <form method="post" class="mr-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Extract Emails</button>
+        </form>
+        {% if data_extracted %}
+            <div>
+                <a href="{% url 'download_json' %}" class="btn btn-info">Download JSON</a>
+                <a href="{% url 'download_csv' %}" class="btn btn-success">Download CSV</a>
+            </div>
+        {% endif %}
+    </div>
     {% if data_extracted %}
         <h3 class="mt-4">Extracted Emails</h3>
         <table class="table table-striped">
@@ -28,9 +36,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <div class="mt-4">
-            <a href="{% url 'download_json' %}" class="btn btn-info">Download JSON</a>
-            <a href="{% url 'download_csv' %}" class="btn btn-success">Download CSV</a>
-        </div>
+    {% else %}
+        <p>No emails found. Please extract emails first.</p>
     {% endif %}
 {% endblock %}

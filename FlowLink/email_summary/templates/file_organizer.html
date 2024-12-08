@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}File Organizer - FlowLink{% endblock %}
+
+{% block content %}
+    <h2 class="my-4">File Organizer</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="directory">Directory Path</label>
+            <input type="text" class="form-control" id="directory" name="directory" placeholder="Enter directory path">
+        </div>
+        <button type="submit" class="btn btn-primary">Organize Files</button>
+    </form>
+    {% if success %}
+        <div class="alert alert-success mt-4">{{ success }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger mt-4">{{ error }}</div>
+    {% endif %}
+{% endblock %}

@@ -1,3 +1,5 @@
+import os
+import shutil
 import imaplib
 import email
 from email.header import decode_header
@@ -6,7 +8,6 @@ import json
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from social_django.utils import psa
 from django.conf import settings
 from django.http import HttpResponse
 from pathlib import Path
@@ -41,14 +42,6 @@ def dashboard(request):
 
 def logout_view(request):
     auth_logout(request)
-    return redirect('login')
-
-@psa('social:complete')
-def authorize(request, backend):
-    user = request.backend.do_auth(request.GET.get('code'))
-    if user:
-        auth_login(request, user)
-        return redirect('dashboard')
     return redirect('login')
 
 def excel_view(request):
@@ -118,3 +111,41 @@ def download_csv(request):
     df.to_csv(path_or_buf=response, index=False)
     
     return response
+
+def file_organizer_view(request):
+    if request.method == 'POST':
+        directory = request.POST.get('directory')
+        if not os.path.isdir(directory):
+            return render(request, 'file_organizer.html', {'error': 'Invalid directory'})
+
+        extensions = {
+            'Documents': ['.pdf', '.doc', '.docx', '.txt'],
+            'Images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp'],
+            'Audio': ['.mp3', '.wav', '.aac'],
+            'Video': ['.mp4', '.avi', '.mkv'],
+            'Archives': ['.zip', '.rar', '.tar'],
+            'Others': []
+        }
+
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+            if os.path.isfile(file_path):
+                file_ext = os.path.splitext(filename)[1].lower()
+                moved = False
+                for folder, exts in extensions.items():
+                    if file_ext in exts:
+                        folder_path = os.path.join(directory, folder)
+                        if not os.path.exists(folder_path):
+                            os.makedirs(folder_path)
+                        shutil.move(file_path, os.path.join(folder_path, filename))
+                        moved = True
+                        break
+                if not moved:
+                    other_folder_path = os.path.join(directory, 'Others')
+                    if not os.path.exists(other_folder_path):
+                        os.makedirs(other_folder_path)
+                    shutil.move(file_path, os.path.join(other_folder_path, filename))
+
+        return render(request, 'file_organizer.html', {'success': 'Files organized successfully!'})
+
+    return render(request, 'file_organizer.html')
