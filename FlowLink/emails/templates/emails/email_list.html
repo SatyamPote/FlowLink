@@ -1,15 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Extract Emails - FlowLink{% endblock %}
+{% block title %}Emails - FlowLink{% endblock %}
 
 {% block content %}
-    <h2 class="my-4">Extract Emails</h2>
-    <form method="post">
-        {% csrf_token %}
-        
-    </form>
+    <h2 class="my-4">Extracted Emails</h2>
     {% if emails %}
-        <h3 class="my-4">Extracted Emails</h3>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -28,6 +23,12 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'download_csv' %}" class="btn btn-success mt-4">Download CSV</a>
+        <div class="mt-4">
+            <a href="{% url 'download_json' %}" class="btn btn-info">Download JSON</a>
+            <a href="{% url 'download_csv' %}" class="btn btn-success">Download CSV</a>
+            <a href="{% url 'download_excel' %}" class="btn btn-primary">Download Excel</a>
+        </div>
+    {% else %}
+        <p>No emails found. Please <a href="{% url 'extract_emails' %}">extract emails</a> first.</p>
     {% endif %}
 {% endblock %}

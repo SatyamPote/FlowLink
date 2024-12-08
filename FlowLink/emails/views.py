@@ -8,3 +8,7 @@ def email_list(request):
 def email_detail(request, email_id):
     email = get_object_or_404(Email, pk=email_id)
     return render(request, 'emails/email_detail.html', {'email': email})
+
+def email_list(request):
+    emails = request.session.get('emails_data', [])
+    return render(request, 'emails/email_list.html', {'emails': emails})

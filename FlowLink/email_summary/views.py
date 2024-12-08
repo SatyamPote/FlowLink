@@ -2,12 +2,14 @@ import imaplib
 import email
 from email.header import decode_header
 import pandas as pd
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from social_django.utils import psa
 from django.conf import settings
 from django.http import HttpResponse
+from pathlib import Path
 
 def login_view(request):
     if request.method == 'POST':
@@ -77,34 +79,58 @@ def extract_emails(request):
         
         emails.append({"subject": subject, "from": from_, "date": date_})
 
-        # Batch processing: if emails list reaches 20, process them
-        if len(emails) % 20 == 0:
-            save_emails_to_session(request, emails)
-            emails = []
+    # Convert emails list to a DataFrame and save to JSON
+    df = pd.DataFrame(emails)
+    json_file_path = Path(settings.BASE_DIR) / 'emails_data.json'
+    df.to_json(json_file_path, orient='records')
 
-    # Process any remaining emails
-    if emails:
-        save_emails_to_session(request, emails)
+    request.session['emails_data_path'] = str(json_file_path)
+    return render(request, 'emails/extract_emails.html', {'emails': emails})
 
-    return render(request, 'emails/extract_emails.html', {'emails': request.session.get('emails_data')})
+def m_data(request):
+    json_file_path = request.session.get('emails_data_path')
+    emails = None
+    if json_file_path and Path(json_file_path).exists():
+        emails = True
+    return render(request, 'emails/m_data.html', {'emails': emails})
 
-def save_emails_to_session(request, emails):
-    existing_emails = request.session.get('emails_data', [])
-    existing_emails.extend(emails)
-    request.session['emails_data'] = existing_emails
+def download_json(request):
+    json_file_path = request.session.get('emails_data_path')
+    if not json_file_path:
+        return redirect('m_data')
 
-def excel_summary(request):
-    emails = request.session.get('emails_data')
-    return render(request, 'emails/excel_summary.html', {'emails': emails})
+    with open(json_file_path, 'r') as f:
+        data = f.read()
+    response = HttpResponse(data, content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename="emails_data.json"'
+    return response
 
 def download_csv(request):
-    emails = request.session.get('emails_data')
-    if not emails:
-        return redirect('extract_emails')
-    
+    json_file_path = request.session.get('emails_data_path')
+    if not json_file_path:
+        return redirect('m_data')
+
+    with open(json_file_path, 'r') as f:
+        emails = json.load(f)
+
     df = pd.DataFrame(emails)
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="emails_summary.csv"'
+    response['Content-Disposition'] = 'attachment; filename="emails_data.csv"'
     df.to_csv(path_or_buf=response, index=False)
+    
+    return response
+
+def download_excel(request):
+    json_file_path = request.session.get('emails_data_path')
+    if not json_file_path:
+        return redirect('m_data')
+
+    with open(json_file_path, 'r') as f:
+        emails = json.load(f)
+
+    df = pd.DataFrame(emails)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="emails_data.xlsx"'
+    df.to_excel(response, index=False)
     
     return response
