@@ -1,33 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}Extract Emails - FlowLink{% endblock %}
+{% block title %}Extract Emails & M-DATA - FlowLink{% endblock %}
 
 {% block content %}
-    <h2 class="my-4">Extract Emails</h2>
+    <h2 class="my-4">Extract Emails & Download Data</h2>
     <form method="post">
         {% csrf_token %}
-        
+        <button type="submit" class="btn btn-primary">Extract Emails</button>
     </form>
     {% if emails %}
-        <h3 class="my-4">Extracted Emails</h3>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">From</th>
-                    <th scope="col">Subject</th>
-                    <th scope="col">Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for email in emails %}
-                    <tr>
-                        <td>{{ email.from }}</td>
-                        <td>{{ email.subject }}</td>
-                        <td>{{ email.date }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <a href="{% url 'download_csv' %}" class="btn btn-success mt-4">Download CSV</a>
+        <p>You can download your extracted email data in JSON or CSV format:</p>
+        <div class="mt-4">
+            <a href="{% url 'download_json' %}" class="btn btn-info">Download JSON</a>
+            <a href="{% url 'download_csv' %}" class="btn btn-success">Download CSV</a>
+        </div>
+    {% else %}
+        <p>No emails found. Please extract emails first.</p>
     {% endif %}
 {% endblock %}

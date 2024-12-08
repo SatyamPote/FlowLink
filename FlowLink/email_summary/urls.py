@@ -9,12 +9,7 @@ urlpatterns = [
     path('register/', main_views.register_view, name='register'),
     path('dashboard/', main_views.dashboard, name='dashboard'),
     path('logout/', main_views.logout_view, name='logout'),
-    path('m_data/', main_views.m_data, name='m_data'),
-    path('emails/<int:email_id>/', email_views.email_detail, name='email_detail'),
-    path('authorize/', main_views.authorize, name='authorize'),
-    path('oauth/', include('social_django.urls', namespace='social')),
-    path('extract_emails/', main_views.extract_emails, name='extract_emails'),
+    path('excel/', main_views.excel_view, name='excel_view'),
     path('download_json/', main_views.download_json, name='download_json'),
     path('download_csv/', main_views.download_csv, name='download_csv'),
-    path('download_excel/', main_views.download_excel, name='download_excel'),
 ]

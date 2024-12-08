@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Extract Emails & Download Data - FlowLink{% endblock %}
+
+{% block content %}
+    <h2 class="my-4">Extract Emails & Download Data</h2>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Extract Emails</button>
+    </form>
+    {% if data_extracted %}
+        <h3 class="mt-4">Extracted Emails</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">From</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email in emails %}
+                    <tr>
+                        <td>{{ email.from }}</td>
+                        <td>{{ email.subject }}</td>
+                        <td>{{ email.date }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="mt-4">
+            <a href="{% url 'download_json' %}" class="btn btn-info">Download JSON</a>
+            <a href="{% url 'download_csv' %}" class="btn btn-success">Download CSV</a>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -3,7 +3,7 @@ import email
 from email.header import decode_header
 import pandas as pd
 import json
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from social_django.utils import psa
@@ -51,53 +51,52 @@ def authorize(request, backend):
         return redirect('dashboard')
     return redirect('login')
 
-def extract_emails(request):
-    # Connect to the Gmail server
-    mail = imaplib.IMAP4_SSL(settings.EMAIL_HOST)
-    mail.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-    mail.select("inbox")
-
-    # Fetch only the latest 100 emails
-    result, data = mail.search(None, "ALL")
-    email_ids = data[0].split()[-100:]
-
+def excel_view(request):
     emails = []
+    data_extracted = False
+    if request.method == 'POST':
+        # Connect to the Gmail server
+        mail = imaplib.IMAP4_SSL(settings.EMAIL_HOST)
+        mail.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+        mail.select("inbox")
 
-    for eid in email_ids:
-        result, msg_data = mail.fetch(eid, "(RFC822)")
-        raw_email = msg_data[0][1]
-        msg = email.message_from_bytes(raw_email)
-        
-        # Decode email subject
-        subject, encoding = decode_header(msg["Subject"])[0]
-        if isinstance(subject, bytes):
-            subject = subject.decode(encoding if encoding else "utf-8")
-        
-        # Get email from and date
-        from_ = msg.get("From")
-        date_ = msg.get("Date")
-        
-        emails.append({"subject": subject, "from": from_, "date": date_})
+        # Fetch only the latest 100 emails
+        result, data = mail.search(None, "ALL")
+        email_ids = data[0].split()[-100:]
 
-    # Convert emails list to a DataFrame and save to JSON
-    df = pd.DataFrame(emails)
-    json_file_path = Path(settings.BASE_DIR) / 'emails_data.json'
-    df.to_json(json_file_path, orient='records')
+        emails_list = []
 
-    request.session['emails_data_path'] = str(json_file_path)
-    return render(request, 'emails/extract_emails.html', {'emails': emails})
+        for eid in email_ids:
+            result, msg_data = mail.fetch(eid, "(RFC822)")
+            raw_email = msg_data[0][1]
+            msg = email.message_from_bytes(raw_email)
+            
+            # Decode email subject
+            subject, encoding = decode_header(msg["Subject"])[0]
+            if isinstance(subject, bytes):
+                subject = subject.decode(encoding if encoding else "utf-8")
+            
+            # Get email from and date
+            from_ = msg.get("From")
+            date_ = msg.get("Date")
+            
+            emails_list.append({"subject": subject, "from": from_, "date": date_})
 
-def m_data(request):
-    json_file_path = request.session.get('emails_data_path')
-    emails = None
-    if json_file_path and Path(json_file_path).exists():
-        emails = True
-    return render(request, 'emails/m_data.html', {'emails': emails})
+        # Convert emails list to a DataFrame and save to JSON
+        df = pd.DataFrame(emails_list)
+        json_file_path = Path(settings.BASE_DIR) / 'emails_data.json'
+        df.to_json(json_file_path, orient='records')
+
+        request.session['emails_data_path'] = str(json_file_path)
+        emails = emails_list
+        data_extracted = True
+
+    return render(request, 'emails/excel.html', {'emails': emails, 'data_extracted': data_extracted})
 
 def download_json(request):
     json_file_path = request.session.get('emails_data_path')
     if not json_file_path:
-        return redirect('m_data')
+        return redirect('excel_view')
 
     with open(json_file_path, 'r') as f:
         data = f.read()
@@ -108,7 +107,7 @@ def download_json(request):
 def download_csv(request):
     json_file_path = request.session.get('emails_data_path')
     if not json_file_path:
-        return redirect('m_data')
+        return redirect('excel_view')
 
     with open(json_file_path, 'r') as f:
         emails = json.load(f)
@@ -117,20 +116,5 @@ def download_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="emails_data.csv"'
     df.to_csv(path_or_buf=response, index=False)
-    
-    return response
-
-def download_excel(request):
-    json_file_path = request.session.get('emails_data_path')
-    if not json_file_path:
-        return redirect('m_data')
-
-    with open(json_file_path, 'r') as f:
-        emails = json.load(f)
-
-    df = pd.DataFrame(emails)
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="emails_data.xlsx"'
-    df.to_excel(response, index=False)
     
     return response
