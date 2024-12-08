@@ -1,13 +1,49 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">
+        <h1>FlowLink</h1>
+      </div>
+    </nav>
+  </header>
 
-{% block title %}Login - FlowLink{% endblock %}
-
-{% block content %}
-    <h2>Login</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
-{% endblock %}
+  <main>
+    <div class="login-container">
+      <div class="login-box">
+        <h2>Login</h2>
+        <form>
+          <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+          </div>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          </div>
+          <div class="checkbox">
+            <input type="checkbox" id="remember-me">
+            <label for="remember-me">Remember me</label>
+            <a href="#" class="forgot-password">Forgot password?</a>
+          </div>
+          <button type="submit">Login</button>
+          <p>Don't have an account? <a href="#">Register</a></p>
+        </form>
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <p>&copy; 2024 FlowLink</p>
+  </footer>
+</body>
+</html>

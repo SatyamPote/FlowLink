@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="file-converter">
+    <h2>File Converter</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="file">Upload File</label>
+            <input type="file" id="file" name="file" required>
+        </div>
+        <div class="form-group">
+            <label for="output_format">Convert to</label>
+            <select id="output_format" name="output_format" required>
+                <option value="pdf">PDF</option>
+                <option value="docx">DOCX</option>
+                <option value="pptx">PPTX</option>
+                <option value="jpg">JPG</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="new_file_name">New File Name (optional)</label>
+            <input type="text" id="new_file_name" name="new_file_name" placeholder="Enter new file name">
+        </div>
+        <button type="submit">
+            <span>Convert</span>
+        </button>
+    </form>
+    {% if error %}
+        <div class="error-message">{{ error }}</div>
+    {% endif %}
+</div>
+{% endblock %}

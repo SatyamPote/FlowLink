@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from emails import views as email_views
 from email_summary import views as main_views
 
@@ -13,4 +13,5 @@ urlpatterns = [
     path('download_json/', main_views.download_json, name='download_json'),
     path('download_csv/', main_views.download_csv, name='download_csv'),
     path('file_organizer/', main_views.file_organizer_view, name='file_organizer'),
+    path('file_converter/', main_views.file_converter_view, name='file_converter'),
 ]

@@ -4,23 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}FlowLink{% endblock %}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>FlowLink</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+@400;700&family=Roboto+@400;700&display=swap">
 </head>
 <body>
-    <header class="bg-dark text-white py-3 mb-4">
-        {% include 'navbar.html' %}
-    </header>
-    <main class="container">
-        {% block content %}
-        {% endblock %}
-    </main>
-    <footer class="bg-dark text-white text-center py-3 mt-4">
-        <p>&copy; 2024 FlowLink. All rights reserved.</p>
-    </footer>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <div class="container">
+        <header>
+            <h1 class="logo">FlowLink</h1>
+        </header>
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+        <footer>
+            <p>&copy; 2024 FlowLink</p>
+        </footer>
+    </div>
 </body>
 </html>
